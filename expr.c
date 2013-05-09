@@ -526,22 +526,20 @@ getsym(void)
 
 	/* get the symbol, stop to the first 'non symbol' char */
 	local_check = *expr;
-	while (valid) {
-		c = *expr;
-		if (isalpha(c) || c == '_' || c == '.' || (isdigit(c) && i >= 1)) {
-			if (i < SBOLSZ - 1)
-				symbol[++i] = c;
-			expr++;
-		}
-		else if((local_check=='.') && ((c=='-') || (c=='+'))) {
-                if (i < SBOLSZ - 1)
-                    symbol[++i] = c;
-                expr++;
-             }
-            else {
-                valid = 0;
-            }
-	}
+    while (valid) {
+        c = *expr;
+        if (isalpha(c) || c == '_' || c == '.' || (isdigit(c) && i >= 1)) {
+            symbol[++i] = c;
+            expr++;
+        }
+        else if((local_check=='.') && ((c=='-') || (c=='+'))) {
+            symbol[++i] = c;
+            expr++;
+        }
+        else {
+            valid = 0;
+        }
+    }
 
 	/* is it a reserved symbol? */
 	if (i == 1) {
@@ -557,6 +555,13 @@ getsym(void)
 	/* store symbol length */
 	symbol[0] = i;
 	symbol[i+1] = '\0';
+
+    if (i > SBOLSZ - 1) {
+        char errorstr[512];
+        snprintf(errorstr, 512, "Symbol name too long ('%s' is %d chars long, max is %d)", symbol + 1, i, SBOLSZ - 1);
+        fatal_error(errorstr);
+    }
+
 	return (i);
 }
 
