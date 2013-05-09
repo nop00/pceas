@@ -1,6 +1,6 @@
 
-#define NES_ASM_VERSION	("NES Assembler (v3.22 Beta, 4/15/2011, Tomaitheous Release)")
-#define PCE_ASM_VERSION	("PC Engine Assembler (v3.22, 4/14/2011, Tomaitheous Release)")
+#define NES_ASM_VERSION	("NES Assembler (v3.23 Beta, 5/09/2013, nop Release)")
+#define PCE_ASM_VERSION	("PC Engine Assembler (v3.23, 5/09/2013, nop Release)")
 
 /* path separator */
 #if defined(DJGPP) || defined(MSDOS) || defined(WIN32)
@@ -27,7 +27,7 @@
 /* line buffer length */
 #define LAST_CH_POS	158
 #define SFIELD	26
-#define SBOLSZ	32
+#define SBOLSZ	64
 
 /* macro argument types */
 #define NO_ARG			0
