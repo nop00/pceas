@@ -11,6 +11,13 @@
 #define PATH_SEPARATOR_STRING "/"
 #endif
 
+#if defined(WIN32) && defined(_MSC_VER)
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#else
+#include <strings.h>
+#endif
+
 /* machine */
 #define MACHINE_PCE	0
 #define MACHINE_NES	1
