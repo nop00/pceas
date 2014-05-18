@@ -77,7 +77,7 @@ rc: realclean
 
 archive: realclean
 	@$(ECHO) "  TBZ2      `date +"%Y/%m/%d"`"
-	@$(CD) ..; $(TAR) jcf etripator-`date +"%Y%m%d"`.tar.bz2 same
+	@$(CD) ..; $(TAR) jcf $(BIN)-`date +"%Y%m%d"`.tar.bz2 same
 
 FORCE :
 ifeq (.depend,$(wildcard .depend))
