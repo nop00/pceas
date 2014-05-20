@@ -27,7 +27,6 @@ static struct INES {		/* INES rom header */
 void
 nes_write_header(FILE *f, int banks)
 {
-    (void)banks;
 	/* setup INES header */
 	memset(&header, 0, sizeof(header));
 	header.id[0] = 'N';
@@ -177,8 +176,8 @@ nes_inesprg(int *ip)
 {
 	if (!evaluate(ip, ';'))
 		return;
-    int svalue = (int)value;
-	if ((svalue < 0) || (svalue > 64)) 
+
+	if ((value < 0) || (value > 64)) 
 	{
 		error("Prg bank value out of range!");
 	
@@ -206,8 +205,7 @@ nes_ineschr(int *ip)
 	if (!evaluate(ip, ';'))
 		return;
 
-    int svalue = (int)value;
-	if ((svalue < 0) || (svalue > 64)) 
+	if ((value < 0) || (value > 64)) 
 	{
 		error("Prg bank value out of range!");
 	
@@ -235,8 +233,7 @@ nes_inesmap(int *ip)
 	if (!evaluate(ip, ';'))
 		return;
 
-    int svalue = (int)value;
-	if ((svalue < 0) || (svalue > 255)) 
+	if ((value < 0) || (value > 255)) 
 	{
 		error("Mapper value out of range!");
 	
@@ -266,8 +263,7 @@ nes_inesmir(int *ip)
 	if (!evaluate(ip, ';'))
 		return;
 
-    int svalue = (int)value;
-	if ((svalue < 0) || (svalue > 15)) 
+	if ((value < 0) || (value > 15)) 
 	{
 		error("Mirror value out of range!");
 	

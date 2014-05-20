@@ -70,9 +70,7 @@ int  func_extract(int ip);
 int  func_getargs(void);
 
 /* INPUT.C */
-int   add_path(char*, int);
-void  cleanup_path(void);
-int   init_path(void);
+void  init_path(void);
 int   readline(void);
 int   open_input(char *name);
 int   close_input(void);
@@ -117,8 +115,8 @@ int  pcx_search_tile(unsigned char *data, int size);
 int  pcx_get_args(int *ip);
 int  pcx_parse_args(int i, int nb, int *a, int *b, int *c, int *d, int size);
 int  pcx_load(char *name);
-void decode_256(FILE *fp, unsigned int w, unsigned int h);
-void decode_16(FILE *fp, unsigned int w, unsigned int h);
+void decode_256(FILE *fp, int w, int h);
+void decode_16(FILE *fp, int w, int h);
 
 /* PROC.C */
 void do_call(int *ip);

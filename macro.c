@@ -76,7 +76,6 @@ do_macro(int *ip)
 void
 do_endm(int *ip)
 {
-    (void)ip;
 	error("Unexpected ENDM!");
 	return;
 }

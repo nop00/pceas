@@ -529,7 +529,7 @@ void
 pce_incbat(int *ip)
 {
 	unsigned char *ptr, ref;
-	int i, j, k, l, x, y, w, h;
+	unsigned int i, j, k, l, x, y, w, h;
 	unsigned int base, index, flag;
 	unsigned int temp;
 
@@ -661,10 +661,10 @@ pce_incpal(int *ip)
 void
 pce_incspr(int *ip)
 {
-	int i, j;
-	int x, y, w, h;
-	int sx, sy;
-	int size;
+	unsigned int i, j;
+	unsigned int x, y, w, h;
+	unsigned int sx, sy;
+	unsigned int size;
 
 	/* define label */
 	labldef(loccnt, 1);
@@ -709,9 +709,9 @@ pce_incspr(int *ip)
 void
 pce_inctile(int *ip)
 {
-	int i, j;
-    int x, y, w, h;
-	int tx, ty;
+	unsigned int i, j;
+	unsigned int x, y, w, h;
+	unsigned int tx, ty;
 	int nb_tile = 0;
 	int size = 0;
 
@@ -768,9 +768,9 @@ pce_inctile(int *ip)
 void
 pce_incmap(int *ip)
 {
-	int i, j;
-	int x, y, w, h;
-	int tx, ty;
+	unsigned int i, j;
+	unsigned int x, y, w, h;
+	unsigned int tx, ty;
 	int tile, size;
 	int err = 0;
 
