@@ -7,6 +7,8 @@
 #include "externs.h"
 #include "protos.h"
 
+#define uEOF ((unsigned int)EOF)
+
 /* globals */
 char pcx_name[128];		/* pcx file name */
 int  pcx_w, pcx_h;		/* pcx dimensions */
@@ -117,7 +119,7 @@ pcx_set_tile(struct t_symbol *ref, unsigned int offset)
 		return (1);
 
 	/* same tile set? */
-	if ((ref == NULL))
+	if (ref == NULL)
 		return (1);
 	if ((ref == tile_lablptr) && (offset == tile_offset))
 		return (1);
@@ -428,7 +430,7 @@ pcx_load(char *name)
  */
 
 void
-decode_256(FILE *f, int w, int h)
+decode_256(FILE *f, unsigned int w, unsigned int h)
 {
 	unsigned int   i, c, x, y;
 	unsigned char *ptr;
@@ -449,7 +451,7 @@ decode_256(FILE *f, int w, int h)
 		/* simple run-length encoding */
 		do {
 			c = fgetc(f);
-			if (c == EOF)
+			if (c ==  uEOF)
 				break;
 			if ((c & 0xC0) != 0xC0)
 				i = 1;
@@ -474,9 +476,9 @@ decode_256(FILE *f, int w, int h)
 	}			
 
 	/* get the palette */
-	if (c != EOF)
+	if (c != uEOF)
 		c = fgetc(f);
-	while ((c != 12) && (c != EOF))
+	while ((c != 12) && (c != uEOF))
 		c = fgetc(f);
 	if (c == 12)
 		fread(pcx_pal, 768, 1, f);
@@ -493,10 +495,11 @@ decode_256(FILE *f, int w, int h)
  */
 
 void
-decode_16(FILE *f, int w, int h)
+decode_16(FILE *f, unsigned int w, unsigned int h)
 {
-	int i, j, k, n;
-	int x, y, p;
+    int k;
+	unsigned int i, j, n;
+	unsigned int x, y, p;
 	unsigned int c, pix;
 	unsigned char *ptr;
 
@@ -517,7 +520,7 @@ decode_16(FILE *f, int w, int h)
 		do {
 			/* get a char */
 			c = fgetc(f);
-			if (c == EOF)
+			if (c == uEOF)
 				break;
 
 			/* check if it's a repeat command */
