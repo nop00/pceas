@@ -631,7 +631,7 @@ do_bank(int *ip)
 	/* get bank index */
 	if (!evaluate(ip, 0))
 		return;
-	if (value > bank_limit) {
+	if ((int)value > bank_limit) {
 		error("Bank index out of range!");
 		return;
 	}
@@ -1034,7 +1034,7 @@ do_rs(int *ip)
 void
 do_ds(int *ip)
 {
-	int limit = 0;
+	unsigned int limit = 0;
 	int addr;
 
 	/* define label */
@@ -1115,7 +1115,8 @@ do_ds(int *ip)
 void
 do_fail(int *ip)
 {
-	fatal_error("Compilation failed!");
+    (void)ip;
+    fatal_error("Compilation failed!");
 }
 
 
@@ -1128,6 +1129,7 @@ do_fail(int *ip)
 void
 do_section(int *ip)
 {
+    (void)ip;
 	if (proc_ptr) {
 		if (optype == S_DATA) {
 			fatal_error("No data segment in procs!");
@@ -1169,9 +1171,9 @@ void
 do_incchr(int *ip)
 {
 	unsigned char buffer[32];
-	unsigned int i, j;
-	unsigned int x, y, w, h;
-	unsigned int tx, ty;
+	int i, j;
+	int x, y, w, h;
+	int tx, ty;
 	int total = 0;
 	int size;
 

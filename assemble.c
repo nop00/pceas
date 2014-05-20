@@ -216,7 +216,7 @@ assemble(void)
 	flag = oplook(&ip);
 	if (flag < 0) {
 		labldef(loccnt, 1);
-		if ((flag == -1))
+		if (flag == -1)
             { error("Unknown instruction!"); }
 		if ((flag == -2) && (pass == LAST_PASS)) {
 			if (lablptr)
@@ -451,6 +451,7 @@ do_if(int *ip)
 void
 do_else(int *ip)
 {
+    (void)ip;
 	if (!in_if)
 		fatal_error("Unexpected ELSE!");
 }
@@ -460,6 +461,7 @@ do_else(int *ip)
 void
 do_endif(int *ip)
 {
+    (void)ip;
 	if (!in_if)
 		fatal_error("Unexpected ENDIF!");
 }
