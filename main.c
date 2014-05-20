@@ -25,6 +25,7 @@
 #include <strings.h>
 #include <string.h>
 #include <ctype.h>
+#include <getopt.h>
 #include "defs.h"
 #include "externs.h"
 #include "protos.h"
@@ -63,6 +64,15 @@ int   list_level;	/* output level */
 int   asm_opt[8];	/* assembler options */
 int   zero_need;	/* counter for trailing empty sectors on CDROM */
 
+/* ----
+ * atexit callback
+ * ----
+ */
+void
+cleanup(void)
+{
+	cleanup_path();
+}
 
 /* ----
  * main()
@@ -75,10 +85,32 @@ main(int argc, char **argv)
 	FILE *fp, *ipl;
 	char *p;
 	char  cmd[80];
-	int i, j;
+	int i, j, opt;
 	int file;
 	int ram_bank;
+	int cd_type;
+	const char *cmd_line_options = "sSl:mhI:";
+	const struct option cmd_line_long_options[] = {
+		{"segment",     0, 0,		's'},
+		{"fullsegment", 0, 0,		'S'},
+		{"listing",	1, 0,		'l'},
+		{"macro",       0, 0, 		'm'},
+		{"raw",		0, &header_opt,  0 },
+		{"cd",		0, &cd_type,	 1 },
+		{"scd",		0, &cd_type,	 2 },
+		{"over",	0, &overlayflag, 1 },
+		{"overlay",	0, &overlayflag, 1 },
+		{"dev",		0, &develo_opt,  1 },
+		{"develo",	0, &develo_opt,  1 },			
+		{"mx",		0, &mx_opt, 	 1 },
+		{"srec",	0, &srec_opt, 	 1 },
+		{"help",	0, 0,		'h'},
+		{0,		0, 0,		 0 }
+	};
 
+	/* register atexit callback */
+	atexit(cleanup);
+	
 	/* get program name */
 	if ((prg_name = strrchr(argv[0], '/')) != NULL)
 		 prg_name++;
@@ -111,89 +143,78 @@ main(int argc, char **argv)
 	cd_opt = 0;
 	mx_opt = 0;
 	file = 0;
-
+	cd_type = 0;
+	
 	/* display assembler version message */
-    printf("%s\n\n", machine->asm_title);
-
-	/* parse command line */
-	if (argc > 1) {
-		for (i = 1; i < argc; i++) {
-			if (argv[i][0] == '-') {
-				/* segment usage */
-				if (!strcmp(argv[i], "-s"))
-					dump_seg = 1;
-				else if (!strcmp(argv[i], "-S"))
-					dump_seg = 2;
-
-				/* forces macros expansion */
-				else if (!strcmp(argv[i], "-m"))
-					mlist_opt = 1;
-
-				/* no header */
-				else if (!strcmp(argv[i], "-raw"))
-					header_opt = 0;
-
-				/* output s-record file */
-				else if (!strcmp(argv[i], "-srec"))
-					srec_opt = 1;
-
-				/* output level */
-				else if (!strncmp(argv[i], "-l", 2)) {
-					/* get level */
-					if (strlen(argv[i]) == 2)
-						list_level = atol(argv[++i]);
-					else
-						list_level = atol(&argv[i][2]);
-
-					/* check range */
-					if (list_level < 0 || list_level > 3)
-						list_level = 2;
+	printf("%s\n\n", machine->asm_title);
+	
+	while ((opt = getopt_long_only (argc, argv, cmd_line_options, cmd_line_long_options, &i)) > 0)
+	{
+		switch(opt)
+		{	
+			case 's':
+				dump_seg = 1;
+				break;
+				
+			case 'S':
+				dump_seg = 2;
+				break;
+			
+			case 'l':
+				/* get level */
+				list_level = atol(optarg);
+				
+				/* check range */
+				if (list_level < 0 || list_level > 3)
+					list_level = 2;
+				break;
+			
+			case 'm':
+				mlist_opt = 1;
+				break;
+				
+			case 'I':
+				if(!add_path(optarg, strlen(optarg)+1))
+				{
+					printf("Error while adding include path\n");
+					return 0;
 				}
+				break;
+				
+			case 'h':
+				help();
+				return 0;
+				
+			default:
+				return 1;
+		}		
+	}
 
-				/* help */
-				else if (!strcmp(argv[i], "-?")) {
-					help();
-					return (0);
-				}
+	/* check for missing asm file */
+	if(optind == argc)
+	{
+		fprintf(stderr, "Missing input file\n");
+		return 0;
+	}
+	
+	/* get file names */
+	for ( ; optind < argc; ++optind, ++file) {
+		strcpy(in_fname, argv[optind]);
+	}
 
-				else {
-					/* PCE specific functions */
-					if (machine->type == MACHINE_PCE) {
-						/* cd-rom */
-						if (!strcmp(argv[i], "-cd")) {
-							cd_opt  = STANDARD_CD;
-							scd_opt = 0;
-						}
-
-						/* super cd-rom */
-						else if (!strcmp(argv[i], "-scd")) {
-							scd_opt = SUPER_CD;
-							cd_opt  = 0;
-						}
-
-						/* cd-rom overlay */
-						else if (!strcmp(argv[i], "-over"))
-							overlayflag = 1;
-						else if (!strcmp(argv[i], "-overlay"))
-							overlayflag = 1;
-
-						/* develo auto-run */
-						else if (!strcmp(argv[i], "-develo"))
-							develo_opt = 1;
-						else if (!strcmp(argv[i], "-dev"))
-							develo_opt = 1;
-
-						/* output mx file */
-						else if (!strcmp(argv[i], "-mx"))
-							mx_opt = 1;
-				 	}
-				}
-			}
-			else {
-				strcpy(in_fname, argv[i]);
-				file++;
-			}
-		}
+	/* Adjust cdrom type values ... */
+	switch(cd_type) {
+		case 1:
+			/* cdrom */	
+			cd_opt  = STANDARD_CD;
+			scd_opt = 0;
+			break;
+			
+		case 2:
+			/* super cdrom */
+			scd_opt = SUPER_CD;
+			cd_opt  = 0;
+			break;
 	}
 
 	if ( (overlayflag == 1) &&
@@ -604,21 +625,27 @@ help(void)
 		prg_name = machine->asm_name;
 
 	/* display help */
-	printf("%s [-options] [-? (for help)] infile\n\n", prg_name);
-	printf("-s/S       : show segment usage\n");
-	printf("-l #       : listing file output level (0-3)\n");
-	printf("-m         : force macro expansion in listing\n");
-	printf("-raw       : prevent adding a ROM header\n");
+	printf("%s [-options] [-h (for help)] infile\n\n", prg_name);
+	printf("-s/S        : show segment usage\n"
+		   "--segment/fullsegment\n"
+		   "-l #        : listing file output level (0-3)\n"
+		   "--listing #\n"
+		   "-m          : force macro expansion in listing\n"
+		   "--macro\n"
+		   "--raw       : prevent adding a ROM header\n"
+		   "-I          : add include path\n");
 	if (machine->type == MACHINE_PCE) {
-		printf("-cd        : create a CD-ROM track image\n");
-		printf("-scd       : create a Super CD-ROM track image\n");
-		printf("-over(lay) : create an executable 'overlay' program segment\n");
-		printf("-dev       : assemble and run on the Develo Box\n");
-		printf("-mx        : create a Develo MX file\n");
+		printf("--cd        : create a CD-ROM track image\n"
+			   "--scd       : create a Super CD-ROM track image\n"
+			   "--over(lay) : create an executable 'overlay' program segment\n"
+			   "--dev(elo)  : assemble and run on the Develo Box\n"
+			   "--mx        : create a Develo MX file\n");
 	}
-	printf("-srec  : create a Motorola S-record file\n");
-	printf("infile : file to be assembled\n");
-	printf("\n");
+	printf("--srec      : create a Motorola S-record file\n"
+		   "-h          : help. Displays this message\n"
+		   "--help\n");
+	
+	printf("infile      : file to be assembled\n\n");
 }
 
 
