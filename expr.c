@@ -7,6 +7,18 @@
 #include "protos.h"
 #include "expr.h"
 
+/* operator priority */
+static const int op_pri[] = {
+	 0 /* START */,  0 /* OPEN  */,
+	 7 /* ADD   */,  7 /* SUB   */,  8 /* MUL   */,  8 /* DIV   */,
+	 8 /* MOD   */, 10 /* NEG   */,  6 /* SHL   */,  6 /* SHR   */,
+	 1 /* OR    */,  2 /* XOR   */,  3 /* AND   */, 10 /* COM   */,
+	 9 /* NOT   */,  4 /* =     */,  4 /* <>    */,  5 /* <     */,
+	 5 /* <=    */,  5 /* >     */,  5 /* >=    */,
+	10 /* DEFIN.*/, 10 /* HIGH  */, 10 /* LOW   */, 10 /* PAGE  */,
+	10 /* BANK  */, 10 /* VRAM  */, 10 /* PAL   */, 10 /* SIZEOF*/
+};
+
 /* ----
  * evaluate()
  * ----
@@ -620,60 +632,50 @@ getsym_op(void)
 }
 
 
-
+/* predefined functions */
+static const struct 
+{
+	const char *name;
+	int op;
+	int machine_type;
+} keyword [8] = {
+	{ "\7DEFINED", OP_DEFINED, MACHINE_ALL },
+	{ "\4HIGH",    OP_HIGH,    MACHINE_ALL },
+	{ "\3LOW",     OP_LOW,     MACHINE_ALL },
+	{ "\4PAGE",    OP_PAGE,    MACHINE_ALL },
+	{ "\4BANK",    OP_BANK,    MACHINE_ALL },
+	{ "\6SIZEOF",  OP_SIZEOF,  MACHINE_ALL },
+	{ "\4VRAM",    OP_VRAM,    MACHINE_PCE },
+	{ "\3PAL",     OP_PAL,     MACHINE_PCE }
+};
 /* ----
  * check_keyword()
  * ----
  * verify if the current symbol is a reserved function
  */
-
 int
 check_keyword(void)
 {
 	int op = 0;
-
+	int i;
 	/* check if its an assembler function */
-	if (!strcasecmp(symbol, keyword[0]))
-		op = OP_DEFINED;
-	else if (!strcasecmp(symbol, keyword[1]))
-		op = OP_HIGH;
-	else if (!strcasecmp(symbol, keyword[2]))
-		op = OP_LOW;
-	else if (!strcasecmp(symbol, keyword[3]))
-		op = OP_PAGE;
-	else if (!strcasecmp(symbol, keyword[4]))
-		op = OP_BANK;
-	else if (!strcasecmp(symbol, keyword[7]))
-		op = OP_SIZEOF;
-	else {
-		if (machine->type == MACHINE_PCE) {
-			/* PCE specific functions */
-			if (!strcasecmp(symbol, keyword[5]))
-				op = OP_VRAM;
-			else if (!strcasecmp(symbol, keyword[6]))
-				op = OP_PAL;
+	for(i=0; (0 == op) && (i<6); i++)
+	{
+		if(((MACHINE_ALL == keyword[i].machine_type) || (machine->type == keyword[i].machine_type)) && 
+			(!strcasecmp(symbol, keyword[i].name)))
+		{
+			op = keyword[i].op;
 		}
 	}
-
 	/* extra setup for functions that send back symbol infos */
-	switch (op) {
-	case OP_DEFINED:
-	case OP_HIGH:
-	case OP_LOW:
-	case OP_PAGE:
-	case OP_BANK:
-	case OP_VRAM:
-	case OP_PAL:
-	case OP_SIZEOF:
+	if(op)
+	{
 		expr_lablptr = NULL;
 		expr_lablcnt = 0;
-		break;
 	}
-
 	/* ok */
 	return (op);
 }
-
 
 /* ----
  * push_op()

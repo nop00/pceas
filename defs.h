@@ -19,6 +19,7 @@
 /* machine */
 #define MACHINE_PCE	0
 #define MACHINE_NES	1
+#define MACHINE_ALL	(-1)
 
 /* reserved bank index */
 #define RESERVED_BANK	0xF0

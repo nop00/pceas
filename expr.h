@@ -1,3 +1,6 @@
+#ifndef PCEAS_EXPR_H
+#define PCEAS_EXPR_H
+
 /* value types */
 #define T_DECIMAL	0
 #define T_HEXA		1
@@ -37,18 +40,6 @@
 #define OP_PAL		27
 #define OP_SIZEOF	28
 
-/* operator priority */
-int op_pri[] = {
-	 0 /* START */,  0 /* OPEN  */,
-	 7 /* ADD   */,  7 /* SUB   */,  8 /* MUL   */,  8 /* DIV   */,
-	 8 /* MOD   */, 10 /* NEG   */,  6 /* SHL   */,  6 /* SHR   */,
-	 1 /* OR    */,  2 /* XOR   */,  3 /* AND   */, 10 /* COM   */,
-	 9 /* NOT   */,  4 /* =     */,  4 /* <>    */,  5 /* <     */,
-	 5 /* <=    */,  5 /* >     */,  5 /* >=    */,
-	10 /* DEFIN.*/, 10 /* HIGH  */, 10 /* LOW   */, 10 /* PAGE  */,
-	10 /* BANK  */, 10 /* VRAM  */, 10 /* PAL   */, 10 /* SIZEOF*/
-};
-
 unsigned int  op_stack[64] = { OP_START };	/* operator stack */
 unsigned int val_stack[64];	/* value stack */
 int op_idx, val_idx;	/* index in the operator and value stacks */
@@ -57,11 +48,5 @@ unsigned char *expr;	/* pointer to the expression string */
 unsigned char *expr_stack[16];	/* expression stack */
 struct t_symbol *expr_lablptr;	/* pointer to the lastest label */
 int expr_lablcnt;		/* number of label seen in an expression */
-char *keyword[8] = {	/* predefined functions */
-	"\7DEFINED",
-	"\4HIGH", "\3LOW",
-	"\4PAGE", "\4BANK",
-	"\4VRAM", "\3PAL",
-	"\6SIZEOF"
-};
 
+#endif /* PCEAS_EXPR_H */
