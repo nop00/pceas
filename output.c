@@ -51,9 +51,7 @@ println(void)
 					prlnbuf[17 + (3*cnt)] = '-';
 				}
 				else {
-					hexcon(2, rom[bank][data_loccnt]);
-					prlnbuf[16 + (3*cnt)] = hex[1];
-					prlnbuf[17 + (3*cnt)] = hex[2];
+					hexcon(2, rom[bank][data_loccnt], &prlnbuf[16 + (3*cnt)]);
 				}
 				data_loccnt++;
 				cnt++;
@@ -80,11 +78,8 @@ println(void)
 void
 clearln(void)
 {
-	int i;
-
-	for (i = 0; i < SFIELD; i++)
-		prlnbuf[i] = ' ';
-	prlnbuf[i] = 0;
+	memset(prlnbuf, ' ', SFIELD);
+	prlnbuf[SFIELD+1] = 0;
 }
 
 
@@ -110,34 +105,27 @@ loadlc(int offset, int pos)
 			prlnbuf[i++] = '-';
 		}
 		else {
-			hexcon(2, bank);
-			prlnbuf[i++] = hex[1];
-			prlnbuf[i++] = hex[2];
+			hexcon(2, bank, &prlnbuf[i]);
 		}
 		prlnbuf[i++] = ':';
 		offset += page << 13;
 	}
-	hexcon(4, offset);
-	prlnbuf[i++] = hex[1];
-	prlnbuf[i++] = hex[2];
-	prlnbuf[i++] = hex[3];
-	prlnbuf[i]   = hex[4];
+	hexcon(4, offset, &prlnbuf[i]);
 }
 
 
 /* ----
  * hexcon()
  * ----
- * convert number supplied as argument to hexadecimal in hex[digit]
+ * convert number supplied as argument to hexadecimal in out
  */
-
 void
-hexcon(int digit, int num)
+hexcon(int digit, int num, char *out)
 {
-	for (; digit > 0; digit--) {
-		hex[digit] = (num & 0x0f) + '0';
-		if (hex[digit] > '9')
-			hex[digit] += 'A' - '9' - 1;
+	int i;
+	for (i=1; i<=digit; i++) {
+		int nibble = num & 0x0f;
+		out[digit-i] = nibble + ((nibble <= 9) ? '0' : 'A');
 		num >>= 4;
 	}
 }
