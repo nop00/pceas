@@ -405,7 +405,7 @@ macro_getargtype(char *arg)
 			c = arg[i];
 			if (isdigit(c) && (i == 0))
 				break;
-			if ((!isalnum(c)) && (c != '_') && (c != '.'))
+			if ((!isalnum(c)) && (c != '_') && (c != '.') && (c != '@'))
 				break;
 		}
 
