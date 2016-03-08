@@ -638,13 +638,17 @@ static const struct
 	const char *name;
 	int op;
 	int machine_type;
-} keyword [8] = {
+} keyword [12] = {
 	{ "\7DEFINED", OP_DEFINED, MACHINE_ALL },
 	{ "\4HIGH",    OP_HIGH,    MACHINE_ALL },
 	{ "\3LOW",     OP_LOW,     MACHINE_ALL },
 	{ "\4PAGE",    OP_PAGE,    MACHINE_ALL },
 	{ "\4BANK",    OP_BANK,    MACHINE_ALL },
 	{ "\6SIZEOF",  OP_SIZEOF,  MACHINE_ALL },
+	{ "\7.HIBYTE", OP_HIGH,    MACHINE_ALL },
+	{ "\7.LOBYTE", OP_LOW,     MACHINE_ALL },
+	{ "\5.BANK",   OP_BANK,    MACHINE_ALL },
+	{ "\7.SIZEOF", OP_SIZEOF,  MACHINE_ALL },
 	{ "\4VRAM",    OP_VRAM,    MACHINE_PCE },
 	{ "\3PAL",     OP_PAL,     MACHINE_PCE }
 };
@@ -659,7 +663,7 @@ check_keyword(void)
 	int op = 0;
 	int i;
 	/* check if its an assembler function */
-	for(i=0; (0 == op) && (i<6); i++)
+	for(i=0; (0 == op) && (i<10); i++)
 	{
 		if(((MACHINE_ALL == keyword[i].machine_type) || (machine->type == keyword[i].machine_type)) && 
 			(!strcasecmp(symbol, keyword[i].name)))
