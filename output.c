@@ -125,7 +125,7 @@ hexcon(int digit, int num, char *out)
 	int i;
 	for (i=1; i<=digit; i++) {
 		int nibble = num & 0x0f;
-		out[digit-i] = nibble + ((nibble <= 9) ? '0' : 'A');
+		out[digit-i] = nibble + ((nibble <= 9) ? '0' : '7');
 		num >>= 4;
 	}
 }
